@@ -1,0 +1,9 @@
+{
+    "QueueConfigurations": [
+      {
+        "QueueArn": "arn:aws:sqs:your-region:your-account-id:your-queue-name",
+        "Events": ["s3:ObjectCreated:*"]
+      }
+    ]
+  }
+  

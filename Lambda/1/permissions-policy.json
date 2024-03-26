@@ -1,0 +1,25 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "dynamodb:*",
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "rekognition:*",
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "sqs:*",
+            "Resource": "*"
+        }
+    ]
+}

@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  Queue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: queue1234567
+  EntryTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: EntryTable
+      AttributeDefinitions:
+        - AttributeName: ImageName
+          AttributeType: S
+      KeySchema:
+        - AttributeName: ImageName
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      StreamSpecification:
+        StreamEnabled: true
+        StreamViewType: NEW_IMAGE
+  VehicleTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: VehicleTable
+      AttributeDefinitions:
+        - AttributeName: VehicleID
+          AttributeType: S
+        - AttributeName: Whitelisted
+          AttributeType: BOOL
+      KeySchema:
+        - AttributeName: VehicleID
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+  SQSTriggerLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: SQSTriggerLambda
+      Runtime: python3.8
+      Handler: index.handler
+      Code:
+        S3Bucket: S3_BUCKET_NAME
+        S3Key: S3_KEY_FOR_SQS_TRIGGER_LAMBDA_CODE.zip
+      Role: arn:aws:iam::numero-de-compte:role/role-lambda
+      Events:
+        SQSEvent:
+          Type: AWS::Lambda::EventSourceMapping
+          Properties:
+            BatchSize: 10
+            EventSourceArn: !GetAtt Queue.Arn
+            FunctionName: !Ref SQSTriggerLambda
+  DynamoDBTriggerLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: DynamoDBTriggerLambda
+      Runtime: python3.8
+      Handler: index.handler
+      Code:
+        S3Bucket: S3_BUCKET_NAME
+        S3Key: S3_KEY_FOR_DYNAMODB_TRIGGER_LAMBDA_CODE.zip
+      Role: arn:aws:iam::numero-de-compte:role/role-lambda
+      Events:
+        DynamoDBEvent:
+          Type: AWS::Lambda::EventSourceMapping
+          Properties:
+            BatchSize: 100
+            EventSourceArn: !GetAtt EntryTable.StreamArn
+            FunctionName: !Ref DynamoDBTriggerLambda
+            StartingPosition: TRIM_HORIZON
