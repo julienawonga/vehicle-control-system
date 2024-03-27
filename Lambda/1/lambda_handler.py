@@ -5,7 +5,7 @@ s3_client = boto3.client('s3')
 rekognition_client = boto3.client('rekognition')
 dynamodb_client = boto3.client('dynamodb')
 
-DYNAMODB_TABLE_NAME = 'VehicleData1234567'
+DYNAMODB_TABLE_NAME = 'EntryTable'
 
 def lambda_handler(event, context):
 

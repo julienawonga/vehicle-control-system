@@ -9,7 +9,7 @@
           "Service": "s3.amazonaws.com"
         },
         "Action": "SQS:SendMessage",
-        "Resource": "arn:aws:sqs:your-region:your-account-id:your-queue-name",
+        "Resource": "arn:aws:sqs:us-east-1:your-account-id:your-queue-name",
         "Condition": {
           "ArnLike": {
             "aws:SourceArn": "arn:aws:s3:::your-bucket-name"

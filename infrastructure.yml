@@ -38,35 +38,35 @@ Resources:
   SQSTriggerLambda:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: SQSTriggerLambda
+      FunctionName: process-image-function
       Runtime: python3.8
-      Handler: index.handler
+      Handler: lambda_handler.lambda_handler
       Code:
-        S3Bucket: S3_BUCKET_NAME
-        S3Key: S3_KEY_FOR_SQS_TRIGGER_LAMBDA_CODE.zip
-      Role: arn:aws:iam::numero-de-compte:role/role-lambda
+        S3Bucket: storefunctionszip
+        S3Key: lambda_handler.zip
+      Role: arn:aws:iam::numero-de-compte:role/process-image-role
       Events:
         SQSEvent:
           Type: AWS::Lambda::EventSourceMapping
           Properties:
             BatchSize: 10
             EventSourceArn: !GetAtt Queue.Arn
-            FunctionName: !Ref SQSTriggerLambda
+            FunctionName: !Ref process-image-function
   DynamoDBTriggerLambda:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: DynamoDBTriggerLambda
+      FunctionName: send-notification-function
       Runtime: python3.8
-      Handler: index.handler
+      Handler: lambda_handler.lambda_handler
       Code:
-        S3Bucket: S3_BUCKET_NAME
-        S3Key: S3_KEY_FOR_DYNAMODB_TRIGGER_LAMBDA_CODE.zip
-      Role: arn:aws:iam::numero-de-compte:role/role-lambda
+        S3Bucket: storefunctionszip
+        S3Key: lambda_handler2.zip
+      Role: arn:aws:iam::numero-de-compte:role/send-notification-role
       Events:
         DynamoDBEvent:
           Type: AWS::Lambda::EventSourceMapping
           Properties:
             BatchSize: 100
             EventSourceArn: !GetAtt EntryTable.StreamArn
-            FunctionName: !Ref DynamoDBTriggerLambda
+            FunctionName: !Ref send-notification-function
             StartingPosition: TRIM_HORIZON

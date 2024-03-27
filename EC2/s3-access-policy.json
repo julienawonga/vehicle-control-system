@@ -7,7 +7,7 @@
           "s3:GetObject",
           "s3:PutObject"
         ],
-        "Resource": "arn:aws:s3:::de-votre-bucket/*"
+        "Resource": "arn:aws:s3:::store-device-images/*"
       }
     ]
   }
