@@ -11,3 +11,4 @@ aws sts get-caller-identity --query "Account" --output text
 aws cloudformation deploy --template-file infrastructure.yml  --stack-name infrastructure
 ```
 
+# You'll discover additional commands within each folder. These commands are located in the ```cmd.md``` file.
