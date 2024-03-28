@@ -9,5 +9,5 @@ aws iam put-role-policy --role-name process-image-role --policy-name LambdaProce
 ```
 
 ```bash
-aws lambda update-function-configuration --function-name process-image-function  --role arn:aws:iam::123456789012:role/process-image-role
+aws lambda update-function-configuration --function-name process-image-function  --role arn:aws:iam::[your-aws-account-id]:role/process-image-role
 ```

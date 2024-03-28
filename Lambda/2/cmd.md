@@ -10,5 +10,5 @@ aws iam put-role-policy --role-name send-notification-role --policy-name LambdaN
 
 
 ```bash
-aws lambda update-function-configuration --function-name send-notification-function  --role arn:aws:iam::123456789012:role/send-notification-role
+aws lambda update-function-configuration --function-name send-notification-function  --role arn:aws:iam::[your-aws-account-id]:role/send-notification-role
 ```

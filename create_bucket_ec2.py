@@ -10,11 +10,13 @@ def create_bucket(bucket_name):
 
 
 def create_ec2_instance(image_id, instance_type, key_name):
-    user_data_script = """
-    #!/bin/bash
+    user_data_script = '''#!/bin/bash
+    sudo su
     yum update -y
     yum install git -y
     yum install unzip -y
+    yum install python3-pip -y
+    pip3 install boto3
     cd /home/ec2-user
     
     # Clone code Python
@@ -28,7 +30,7 @@ def create_ec2_instance(image_id, instance_type, key_name):
     
     
     python3 device.py /home/ec2-user/device-coursew/images/
-    """
+    '''
 
     instance = ec2_resource.create_instances(
         ImageId=image_id,
@@ -49,4 +51,4 @@ if __name__ == '__main__':
 
     create_bucket(bucket_name)
 
-    create_ec2_instance('ami-0bd01824d64912730', 't2.micro', 'my-key-pair') 
+    create_ec2_instance('ami-0c101f26f147fa7fd', 't2.micro', 'mykeypaire') 

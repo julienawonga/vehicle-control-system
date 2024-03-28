@@ -6,8 +6,8 @@ from botocore.exceptions import ClientError
 ses_client = boto3.client('ses')
 
 # Define the email details
-SENDER_EMAIL = 'john.doe@example.com'  
-RECIPIENT_EMAIL = 'julienawon@gmail.com' 
+SENDER_EMAIL = 'Megane Farelle <megane.farelle@gmail.com>'  
+RECIPIENT_EMAIL = 'megane.farelle@gmail.com' 
 SUBJECT = 'Security Alert: Action Required'
 CHARSET = 'UTF-8'
 

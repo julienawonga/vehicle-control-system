@@ -1,9 +1,10 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Resources:
   Queue:
     Type: AWS::SQS::Queue
     Properties:
       QueueName: queue1234567
+
   EntryTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -18,8 +19,8 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
       StreamSpecification:
-        StreamEnabled: true
         StreamViewType: NEW_IMAGE
+
   VehicleTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -27,14 +28,13 @@ Resources:
       AttributeDefinitions:
         - AttributeName: VehicleID
           AttributeType: S
-        - AttributeName: Whitelisted
-          AttributeType: BOOL
       KeySchema:
         - AttributeName: VehicleID
           KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+
   SQSTriggerLambda:
     Type: AWS::Lambda::Function
     Properties:
@@ -42,16 +42,10 @@ Resources:
       Runtime: python3.8
       Handler: lambda_handler.lambda_handler
       Code:
-        S3Bucket: storefunctionszip
+        S3Bucket: zipstorefunctionszip
         S3Key: lambda_handler.zip
-      Role: arn:aws:iam::numero-de-compte:role/process-image-role
-      Events:
-        SQSEvent:
-          Type: AWS::Lambda::EventSourceMapping
-          Properties:
-            BatchSize: 10
-            EventSourceArn: !GetAtt Queue.Arn
-            FunctionName: !Ref process-image-function
+      Role: arn:aws:iam::[your-aws-account-id]:role/process-image-role
+
   DynamoDBTriggerLambda:
     Type: AWS::Lambda::Function
     Properties:
@@ -59,14 +53,21 @@ Resources:
       Runtime: python3.8
       Handler: lambda_handler.lambda_handler
       Code:
-        S3Bucket: storefunctionszip
+        S3Bucket: zipstorefunctionszip
         S3Key: lambda_handler2.zip
-      Role: arn:aws:iam::numero-de-compte:role/send-notification-role
-      Events:
-        DynamoDBEvent:
-          Type: AWS::Lambda::EventSourceMapping
-          Properties:
-            BatchSize: 100
-            EventSourceArn: !GetAtt EntryTable.StreamArn
-            FunctionName: !Ref send-notification-function
-            StartingPosition: TRIM_HORIZON
+      Role: arn:aws:iam::[your-aws-account-id]:role/send-notification-role
+
+  SQSEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 10
+      EventSourceArn: !GetAtt Queue.Arn
+      FunctionName: !Ref SQSTriggerLambda
+
+  DynamoDBEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 100
+      EventSourceArn: !GetAtt EntryTable.StreamArn
+      FunctionName: !Ref DynamoDBTriggerLambda
+      StartingPosition: TRIM_HORIZON

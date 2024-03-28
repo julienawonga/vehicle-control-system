@@ -2,6 +2,7 @@ import argparse
 import boto3
 import os
 import time
+import uuid
 
 # Setting up AWS S3 client
 s3_client = boto3.client('s3')
@@ -14,11 +15,16 @@ def upload_images(bucket_name, image_paths):
         bucket_name (str): The name of the S3 bucket.
         image_paths (list): List of paths to the images to be uploaded.
     """
-    for image_path in image_paths:
-        file_name = os.path.basename(image_path)
-        s3_client.upload_file(image_path, bucket_name, file_name)
-        print(f"Uploaded {file_name} to {bucket_name}.")
-        time.sleep(30)  # Delay between uploads
+    try:
+        for image_path in image_paths:
+            file_name = os.path.basename(image_path)
+            unique_name = str(uuid.uuid4())  # Generate a random unique name
+            new_file_name = f"{unique_name}_{file_name}"  # Append the unique name to the file name
+            s3_client.upload_file(image_path, bucket_name, new_file_name)
+            print(f"Uploaded {new_file_name} to {bucket_name}.")
+            time.sleep(30)  # Delay between uploads
+    except Exception as e:
+        print(f"Error uploading image: {str(e)}")
 
 def get_image_paths(directory):
     """
