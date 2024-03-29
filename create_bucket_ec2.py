@@ -5,7 +5,7 @@ ec2_resource = boto3.resource('ec2')
 
 def create_bucket(bucket_name):
     s3_client.create_bucket(Bucket=bucket_name)
-    print(f"Bucket {bucket_name} created.")
+    # print(f"Bucket {bucket_name} created.")
 
 
 
@@ -40,7 +40,8 @@ def create_ec2_instance(image_id, instance_type, key_name):
         MaxCount=1,
         UserData=user_data_script,
     )
-    print(f"EC2 Instance {instance[0].id} created.")
+    # print(f"EC2 Instance {instance[0].id} created.")
+    return instance[0].id
 
     
 
