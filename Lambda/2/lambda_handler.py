@@ -1,74 +1,82 @@
 import boto3
 import json
+import logging
 from botocore.exceptions import ClientError
+
+# Setup logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 # Initialize the AWS SES client
 ses_client = boto3.client('ses')
 
-# Define the email details
-SENDER_EMAIL = 'Megane Farelle <megane.farelle@gmail.com>'  
-RECIPIENT_EMAIL = 'megane.farelle@gmail.com' 
+# Retrieve email details from environment variables for better security practices
+SENDER_EMAIL = 'Megane Farelle <megane.farelle@gmail.com>'
+RECIPIENT_EMAIL = 'megane.farelle@gmail.com'
 SUBJECT = 'Security Alert: Action Required'
 CHARSET = 'UTF-8'
+
+def check_vehicle_status(detected_texts, table):
+    results = []
+    for vehicle_id in detected_texts:
+        try:
+            response = table.get_item(Key={'VehicleID': vehicle_id})
+            if 'Item' in response:
+                vehicle_status = response['Item'].get('Status')
+                if vehicle_status == 'blacklisted':
+                    results.append({'vehicle_id': vehicle_id, 'status': 'blacklisted'})
+            else:
+                results.append({'vehicle_id': vehicle_id, 'status': 'not found'})
+        except Exception as e:
+            results.append({'vehicle_id': vehicle_id, 'status': 'error', 'error_message': str(e)})
+    return results
 
 def send_email(recipient, subject, body_text):
     try:
         response = ses_client.send_email(
-            Destination={
-                'ToAddresses': [recipient]
-            },
+            Destination={'ToAddresses': [recipient]},
             Message={
-                'Body': {
-                    'Text': {
-                        'Charset': CHARSET,
-                        'Data': body_text
-                    },
-                },
-                'Subject': {
-                    'Charset': CHARSET,
-                    'Data': subject,
-                },
+                'Body': {'Text': {'Charset': CHARSET, 'Data': body_text}},
+                'Subject': {'Charset': CHARSET, 'Data': subject},
             },
             Source=SENDER_EMAIL,
         )
     except ClientError as e:
-        print(f"An error occurred: {e.response['Error']['Message']}")
+        logger.error(f"An error occurred: {e.response['Error']['Message']}")
     else:
-        print(f"Email sent! Message ID: {response['MessageId']}")
+        logger.info(f"Email sent! Message ID: {response['MessageId']}")
 
 def lambda_handler(event, context):
-    # Process each record from the DynamoDB stream
+    dynamodb = boto3.resource('dynamodb')
+    table_name = 'VehicleTable'
+    table = dynamodb.Table(table_name)
+
     for record in event['Records']:
-        if record['eventName'] == 'INSERT':  # Check for new entries only
+        if record['eventName'] == 'INSERT':
             new_image = record['dynamodb']['NewImage']
-            
-            # Extract the relevant information from the new DynamoDB entry
             image_name = new_image['ImageName']['S']
             detected_texts = json.loads(new_image['DetectedTexts']['S'])
             detected_labels = json.loads(new_image['DetectedLabels']['S'])
 
-            # Determine if an action is needed based on the detected text or labels
-            # For demonstration purposes, let's assume we check for a "Blacklisted" label
-            blacklisted = any(label['Name'] == 'Blacklisted' for label in detected_labels)
+            results = check_vehicle_status(detected_texts, table)
+            blacklisted = any(result['status'] == 'blacklisted' for result in results)
+            blacklisted_vehicles = [result['vehicle_id'] for result in results if result['status'] == 'blacklisted']
             
-            # If conditions are met, send an email notification
             if blacklisted:
                 email_body = (
                     f"A blacklisted vehicle has been detected in the image: {image_name}\n"
-                    f"Detected Texts: {detected_texts}\n"
-                    f"Detected Labels: {detected_labels}"
+                    f"Blacklisted vehicles: {', '.join(blacklisted_vehicles)}"
+                    f"\n\nDetected labels: {', '.join(label['Name'] for label in detected_labels)}"
+                    f"\nDetected texts: {', '.join(detected_texts)}"
+                    f"\n\nPlease take the necessary action."
+                    f"\n\nThis is an automated message."
+                    f"\n\nThank you."
+                    f"\nSecurity Team"
                 )
                 send_email(RECIPIENT_EMAIL, SUBJECT, email_body)
-                print(f"Alert sent for image: {image_name}")
+                logger.info(f"Alert sent for image: {image_name}")
             else:
-                email_body = (
-                    f"A blacklisted vehicle has been detected in the image: {image_name}\n"
-                    f"Detected Texts: {detected_texts}\n"
-                    f"Detected Labels: {detected_labels}"
-                )
-                send_email(RECIPIENT_EMAIL, SUBJECT, email_body)
-                print(f"Alert sent for image: {image_name}")
+                logger.info(f"No action required for image: {image_name}")
     
-    # Return a success response
     return {'statusCode': 200, 'body': json.dumps('Email notification processing completed successfully.')}
 
