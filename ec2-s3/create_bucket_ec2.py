@@ -7,8 +7,6 @@ def create_bucket(bucket_name):
     s3_client.create_bucket(Bucket=bucket_name)
     # print(f"Bucket {bucket_name} created.")
 
-
-
 def create_ec2_instance(image_id, instance_type, key_name):
     user_data_script = '''#!/bin/bash
     sudo su
@@ -41,15 +39,15 @@ def create_ec2_instance(image_id, instance_type, key_name):
         UserData=user_data_script,
     )
     # print(f"EC2 Instance {instance[0].id} created.")
-    return instance[0].id
+    print(f'{instance[0].id}')
 
     
 
 
 if __name__ == '__main__':
 
-    bucket_name = 'store-device-images' 
+    bucket_name = 'store-device-images-s2110849' 
 
     create_bucket(bucket_name)
 
-    create_ec2_instance('ami-0c101f26f147fa7fd', 't2.micro', 'mykeypaire') 
+    create_ec2_instance('ami-0c101f26f147fa7fd', 't2.micro', 'mykey123') 

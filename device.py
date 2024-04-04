@@ -53,7 +53,7 @@ def main():
 
     # Retrieving image paths and uploading to S3
     image_paths = get_image_paths(args.directory)
-    bucket_name = 'store-device-images'
+    bucket_name = 'store-device-images-s2110849'
 
     while  True:
         upload_images(bucket_name, image_paths)

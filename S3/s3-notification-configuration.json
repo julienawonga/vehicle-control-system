@@ -1,9 +1,0 @@
-{
-    "QueueConfigurations": [
-      {
-        "QueueArn": "arn:aws:sqs:us-east-1:[your-aws-account-id]:queue1234567",
-        "Events": ["s3:ObjectCreated:*"]
-      }
-    ]
-  }
-  

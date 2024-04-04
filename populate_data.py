@@ -20,5 +20,6 @@ def add_vehicle(table_name, vehicle_id, status):
 
 if __name__ == '__main__':
 
-    table_name = 'VehicleTable'
-    add_vehicle(table_name, '10652OC22', 'blacklisted')
+    table_name = 'VehicleTable-s2110849'
+    add_vehicle(table_name, '10652 OC 22', 'blacklisted')
+    add_vehicle(table_name, '8740 NV 12', 'blacklisted')

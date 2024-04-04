@@ -11,8 +11,8 @@ logger.setLevel(logging.INFO)
 ses_client = boto3.client('ses')
 
 # Retrieve email details from environment variables for better security practices
-SENDER_EMAIL = 'Megane Farelle <megane.farelle@gmail.com>'
-RECIPIENT_EMAIL = 'megane.farelle@gmail.com'
+SENDER_EMAIL = 'Megane Farelle <julienawon@gmail.com>'
+RECIPIENT_EMAIL = 'julienawon@gmail.com'
 SUBJECT = 'Security Alert: Action Required'
 CHARSET = 'UTF-8'
 
@@ -48,7 +48,7 @@ def send_email(recipient, subject, body_text):
 
 def lambda_handler(event, context):
     dynamodb = boto3.resource('dynamodb')
-    table_name = 'VehicleTable'
+    table_name = 'VehicleTable-s2110849'
     table = dynamodb.Table(table_name)
 
     for record in event['Records']:
