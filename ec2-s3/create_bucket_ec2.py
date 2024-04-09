@@ -50,4 +50,4 @@ if __name__ == '__main__':
 
     create_bucket(bucket_name)
 
-    create_ec2_instance('ami-0c101f26f147fa7fd', 't2.micro', 'mykey123') 
+    create_ec2_instance('ami-0c101f26f147fa7fd', 't2.micro', 'vockey') 

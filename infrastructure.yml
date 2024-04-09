@@ -44,18 +44,18 @@ Resources:
       Code:
         S3Bucket: zipstorefunctions-s2110849
         S3Key: process-image-function-s2110849.zip
-      Role: arn:aws:iam::028356414026:role/process-image-role-s2110849
+      Role: arn:aws:iam::211125692741:role/LabRole
 
   DynamoDBTriggerLambda:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: send-notification-function-s2110849
+      FunctionName: send-alerte-function-s2110849
       Runtime: python3.8
       Handler: lambda_handler.lambda_handler
       Code:
         S3Bucket: zipstorefunctions-s2110849
         S3Key: send-alerte-function-s2110849.zip
-      Role: arn:aws:iam::028356414026:role/send-notification-role-s2110849
+      Role: arn:aws:iam::211125692741:role/LabRole
 
   SQSEventSourceMapping:
     Type: AWS::Lambda::EventSourceMapping

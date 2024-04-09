@@ -7,14 +7,11 @@ from botocore.exceptions import ClientError
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-# Initialize the AWS SES client
-ses_client = boto3.client('ses')
+# Initialize the AWS SNS client
+sns_client = boto3.client('sns')
 
-# Retrieve email details from environment variables for better security practices
-SENDER_EMAIL = 'Megane Farelle <julienawon@gmail.com>'
-RECIPIENT_EMAIL = 'julienawon@gmail.com'
-SUBJECT = 'Security Alert: Action Required'
-CHARSET = 'UTF-8'
+# Specify the ARN of your SNS topic
+SNS_TOPIC_ARN = 'arn:aws:sns:us-east-1:211125692741:sendMailTopic'
 
 def check_vehicle_status(detected_texts, table):
     results = []
@@ -31,15 +28,16 @@ def check_vehicle_status(detected_texts, table):
             results.append({'vehicle_id': vehicle_id, 'status': 'error', 'error_message': str(e)})
     return results
 
-def send_email(recipient, subject, body_text):
+
+
+def send_email(topic_arn, subject, message):
+    # Construct the message to be sent via SNS
+    email_message = f"Subject: {subject}\n\n{message}"
     try:
-        response = ses_client.send_email(
-            Destination={'ToAddresses': [recipient]},
-            Message={
-                'Body': {'Text': {'Charset': CHARSET, 'Data': body_text}},
-                'Subject': {'Charset': CHARSET, 'Data': subject},
-            },
-            Source=SENDER_EMAIL,
+        # Publish the message to the SNS topic
+        response = sns_client.publish(
+            TopicArn=topic_arn,
+            Message=email_message
         )
     except ClientError as e:
         logger.error(f"An error occurred: {e.response['Error']['Message']}")
@@ -63,6 +61,7 @@ def lambda_handler(event, context):
             blacklisted_vehicles = [result['vehicle_id'] for result in results if result['status'] == 'blacklisted']
             
             if blacklisted:
+                email_subject = 'Security Alert: Action Required'
                 email_body = (
                     f"A blacklisted vehicle has been detected in the image: {image_name}\n"
                     f"Blacklisted vehicles: {', '.join(blacklisted_vehicles)}"
@@ -73,10 +72,9 @@ def lambda_handler(event, context):
                     f"\n\nThank you."
                     f"\nSecurity Team"
                 )
-                send_email(RECIPIENT_EMAIL, SUBJECT, email_body)
+                send_email(SNS_TOPIC_ARN, email_subject, email_body)
                 logger.info(f"Alert sent for image: {image_name}")
             else:
                 logger.info(f"No action required for image: {image_name}")
     
     return {'statusCode': 200, 'body': json.dumps('Email notification processing completed successfully.')}
-

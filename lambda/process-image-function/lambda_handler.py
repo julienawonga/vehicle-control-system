@@ -49,6 +49,9 @@ def lambda_handler(event, context):
                     'DetectedTexts': {'S': json.dumps(detected_texts)}
                 }
             )
+            #print detected labels and texts
+            print(f"Detected labels: {detected_labels}")
+            print(f"Detected texts: {detected_texts}")
             
             # Log the stored data confirmation
             print(f"Stored detected labels and texts for image {object_key} in DynamoDB.")
