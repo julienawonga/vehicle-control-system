@@ -5,4 +5,3 @@
 4. Attach roles to the lambda functions
 5. Attache policies to S3 bucket (for sqs event notification)
 6. Attache policies to SQS (for s3 event notification)
-7. Run script in ec2-s3 
