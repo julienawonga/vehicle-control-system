@@ -2,6 +2,8 @@
 
 A cloud-based security application designed to monitor and control vehicle entry at security checkpoints. This project uses AWS Rekognition for image analysis and license plate detection, alongside automated workflows for a seamless and secure experience.
 
+![architecture](https://github.com/user-attachments/assets/a3ff7523-8300-415b-ae0e-e3bf266c44ad)
+
 ## Table of Contents
 - [Project Overview](#project-overview)
 - [Architecture](#architecture)
