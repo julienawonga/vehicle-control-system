@@ -1,4 +1,4 @@
-# Vehicle Control System with AWS AI Services
+# Vehicle Control System with AWS AI Services 
 
 A cloud-based security application designed to monitor and control vehicle entry at security checkpoints. This project uses AWS Rekognition for image analysis and license plate detection, alongside automated workflows for a seamless and secure experience.
 
